@@ -1,0 +1,8 @@
+id,name,description,business_rule,complexity,category
+1,Account Number Not Empty,Every record must have an account number,Account Number must not be null or empty,simple,completeness
+2,Non-Negative Closing Balance,Account balances cannot be negative,Closing Balance must be greater than or equal to zero,simple,validity
+3,Valid Return Range,Net returns must be within realistic bounds,Net Return must be between -1 and 1,medium,validity
+4,Date Sequence Validation,Performance date must precede period end date,Performance Date must be less than or equal to Period End Date,medium,consistency
+5,Gross Return Exceeds Net,Gross return should always be higher than net return due to fees,Gross Return must be greater than or equal to Net Return,medium,consistency
+6,Inflows Equal Deposits,Total inflows should match deposits,Total Inflows must equal Deposits,medium,consistency
+7,YTD Return Bounds Check,Year-to-date returns must be realistic,YTD Return must be between -0.5 and 0.5 when Closing Balance is greater than 100000,complex,business_logic

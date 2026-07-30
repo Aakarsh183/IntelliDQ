@@ -1,0 +1,5 @@
+{
+  "dataset_filename": "sample_source_data.xlsx",
+  "rules_filename": "sample_rules.xlsx",
+  "schema_filename": "target_schema 1.json"
+}

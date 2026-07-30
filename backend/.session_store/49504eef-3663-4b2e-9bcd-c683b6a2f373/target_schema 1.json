@@ -1,0 +1,47 @@
+{
+  "description": "Unified target schema for performance data. All vendor data maps to these columns.",
+  
+  "target_columns": [
+    {"name": "file_id", "type": "string", "category": "system"},
+    {"name": "company_id", "type": "string", "category": "system"},
+    {"name": "evestnet_raw_data_file_line_id", "type": "string", "category": "system"},
+    {"name": "orion_raw_data_file_line_id", "type": "string", "category": "system"},
+    {"name": "black_diamond_raw_data_file_line_id", "type": "string", "category": "system"},
+    
+    {"name": "account_number", "type": "string", "category": "account"},
+    {"name": "previous_account_number", "type": "string", "category": "account"},
+    {"name": "advisor_name", "type": "string", "category": "account"},
+    {"name": "custodian_name", "type": "string", "category": "account"},
+    {"name": "accounting_system", "type": "string", "category": "account"},
+    
+    {"name": "performance_day", "type": "date", "category": "temporal"},
+    {"name": "performance_month_year", "type": "string", "category": "temporal"},
+    {"name": "performance_inception_date", "type": "date", "category": "temporal"},
+    {"name": "performance_end_date", "type": "date", "category": "temporal"},
+    {"name": "end_date", "type": "date", "category": "temporal"},
+    
+    {"name": "contributions", "type": "decimal", "category": "financial"},
+    {"name": "withdrawls", "type": "decimal", "category": "financial"},
+    {"name": "fees_amount", "type": "decimal", "category": "financial"},
+    {"name": "tax_withheld_monthly", "type": "decimal", "category": "financial"},
+    {"name": "market_change", "type": "decimal", "category": "financial"},
+    {"name": "inception_invested_dollar", "type": "decimal", "category": "financial"},
+    
+    {"name": "ending_market_value", "type": "decimal", "category": "metrics"},
+    {"name": "net_return_value", "type": "decimal", "category": "metrics"},
+    {"name": "gross_return_value", "type": "decimal", "category": "metrics"},
+    {"name": "net_flow", "type": "decimal", "category": "metrics"},
+    {"name": "gross_flow", "type": "decimal", "category": "metrics"},
+    {"name": "cumulative_net_return", "type": "decimal", "category": "metrics"},
+    {"name": "cumulative_net_flow", "type": "decimal", "category": "metrics"},
+    
+    {"name": "record_type", "type": "string", "category": "metadata"},
+    {"name": "test", "type": "string", "category": "metadata"},
+    {"name": "return_type", "type": "string", "category": "metadata"},
+    {"name": "action_flag", "type": "string", "category": "metadata"},
+    {"name": "return_calculation_method", "type": "string", "category": "metadata"},
+    {"name": "interval", "type": "string", "category": "metadata"},
+    {"name": "accrued_flag", "type": "string", "category": "metadata"},
+    {"name": "created_date_time", "type": "timestamp", "category": "metadata"}
+  ]
+}

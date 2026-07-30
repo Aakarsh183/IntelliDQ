@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Account Number Not Empty",
+    "description": "Every record must have an account number",
+    "business_rule": "Account Number must not be null or empty",
+    "complexity": "simple",
+    "category": "completeness",
+    "entities": [
+      "Account Number"
+    ],
+    "check_type": "not_null",
+    "check_parameters": {
+      "field": "account_number",
+      "allow_empty": false
+    }
+  },
+  {
+    "name": "Non-Negative Closing Balance",
+    "description": "Account balances cannot be negative",
+    "business_rule": "Closing Balance must be greater than or equal to zero",
+    "complexity": "simple",
+    "category": "validity",
+    "entities": [
+      "Closing Balance"
+    ],
+    "check_type": "range",
+    "check_parameters": {
+      "min_value": 0
+    }
+  },
+  {
+    "name": "Valid Return Range",
+    "description": "Net returns must be within realistic bounds",
+    "business_rule": "Net Return must be between -1 and 1",
+    "complexity": "medium",
+    "category": "validity",
+    "entities": [
+      "Net Return"
+    ],
+    "check_type": "range",
+    "check_parameters": {
+      "min_value": -1,
+      "max_value": 1
+    }
+  },
+  {
+    "name": "Date Sequence Validation",
+    "description": "Performance date must precede period end date",
+    "business_rule": "Performance Date must be less than or equal to Period End Date",
+    "complexity": "medium",
+    "category": "consistency",
+    "entities": [
+      "Performance Date",
+      "Period End Date"
+    ],
+    "check_type": "comparison",
+    "check_parameters": {
+      "field_1": "performance_day",
+      "operator": "<=",
+      "field_2": "end_date"
+    }
+  },
+  {
+    "name": "Gross Return Exceeds Net",
+    "description": "Gross return should always be higher than net return due to fees",
+    "business_rule": "Gross Return must be greater than or equal to Net Return",
+    "complexity": "medium",
+    "category": "consistency",
+    "entities": [
+      "Gross Return",
+      "Net Return"
+    ],
+    "check_type": "comparison",
+    "check_parameters": {
+      "left_field": "gross_return_value",
+      "operator": ">=",
+      "right_field": "net_return_value"
+    }
+  },
+  {
+    "name": "Inflows Equal Deposits",
+    "description": "Total inflows should match deposits",
+    "business_rule": "Total Inflows must equal Deposits",
+    "complexity": "medium",
+    "category": "consistency",
+    "entities": [
+      "Total Inflows",
+      "Deposits"
+    ],
+    "check_type": "comparison",
+    "check_parameters": {
+      "field_1": "inflows",
+      "field_2": "deposits",
+      "operator": "equal"
+    }
+  },
+  {
+    "name": "YTD Return Bounds Check",
+    "description": "Year-to-date returns must be realistic",
+    "business_rule": "YTD Return must be between -0.5 and 0.5 when Closing Balance is greater than 100000",
+    "complexity": "complex",
+    "category": "business_logic",
+    "entities": [
+      "YTD Return",
+      "Closing Balance"
+    ],
+    "check_type": "comparison",
+    "check_parameters": {
+      "field": "YTD Return",
+      "operator": "between",
+      "min_value": -0.5,
+      "max_value": 0.5,
+      "condition_field": "Closing Balance",
+      "condition_operator": ">",
+      "condition_value": 100000
+    }
+  }
+]
