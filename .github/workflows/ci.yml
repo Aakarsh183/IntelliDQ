@@ -93,6 +93,15 @@ jobs:
           cache: npm
           cache-dependency-path: dq-app/package-lock.json
 
+      # `npm ci` reads the lockfile but recomputes the dependency tree, and npm has
+      # changed how it treats optional peer dependencies between 10.x patches. A lock
+      # written by a different npm therefore fails with "Missing: <pkg> from lock file"
+      # even when package.json has not been touched. Pinning an exact npm here and in
+      # refresh-lockfile.yml is what keeps the lock and this job in permanent agreement
+      # - so do not bump one without regenerating the lock with the other.
+      - name: Pin npm
+        run: npm install -g npm@10.9.2
+
       - name: Install dependencies
         working-directory: dq-app
         run: npm ci
