@@ -30,6 +30,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/browser/axios.cjs"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",
