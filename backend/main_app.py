@@ -4027,7 +4027,7 @@ async def regenerate_code(payload: dict):
     tables_meta  = session["tables_meta"]
     rule_name    = rule.get("name", "")
 
-    def _find_tables_for_schema_cols(schema_cols, schema_to_dataset, tables_meta, original_dfs):
+    def _find_tables_for_schema_cols(schema_cols, schema_to_dataset, tables_meta):
         involved = set()
         for schema_col in schema_cols:
             dataset_col = schema_to_dataset.get(schema_col, schema_col)
@@ -4045,7 +4045,7 @@ async def regenerate_code(payload: dict):
     rule_schema_cols = [mapped_dict[e] for e in entities if e in mapped_dict]
 
     involved_tables = _find_tables_for_schema_cols(
-        rule_schema_cols, schema_to_dataset, tables_meta, original_dfs
+        rule_schema_cols, schema_to_dataset, tables_meta
     )
 
     if not involved_tables:
