@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 120
+
+# Patterns are matched against basenames, so bare filenames are used for the
+# per-file entries rather than backend/<name>.
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    node_modules,
+    dq-app,
+    src,
+    .session_store,
+    dq_checks.py,
+    test.py
+
+# F401 unused import / F403,F405 star-imports: tolerated during bootstrap because
+# backend/main.py uses `from pyspark.sql.functions import *` and the stale ''' blocks
+# leave hundreds of nominally-unused imports behind. Ratchet these down one category
+# at a time, moving each into the blocking flake8 step in ci.yml as it is cleaned.
+extend-ignore = E501, W503, F401, F403, F405
