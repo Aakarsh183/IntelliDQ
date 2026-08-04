@@ -4023,7 +4023,7 @@ async def regenerate_code(payload: dict):
         return response
 
     dfs          = session["dfs"]
-    #original_dfs = session["original_dfs"]
+    # original_dfs = session["original_dfs"]
     tables_meta  = session["tables_meta"]
     rule_name    = rule.get("name", "")
 
