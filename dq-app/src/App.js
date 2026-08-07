@@ -19,7 +19,6 @@ import ErrorIcon         from "@mui/icons-material/Error";
 import CloseIcon         from "@mui/icons-material/Close";
 import TuneIcon          from "@mui/icons-material/Tune";
 import DatasetIcon       from "@mui/icons-material/Dataset";
-import RuleIcon          from "@mui/icons-material/Rule";
 import BarChartIcon      from "@mui/icons-material/BarChart";
 import HourglassTopIcon  from "@mui/icons-material/HourglassTop";
 import Editor            from "@monaco-editor/react";
@@ -355,9 +354,10 @@ function App() {
   const [chatOpen, setChatOpen]                   = useState(false);
   const [chatMessages, setChatMessages]           = useState([]);
   const [chatInput, setChatInput]                 = useState("");
-  const [chatLoading, setChatLoading]             = useState(false);
-  const [chatExportReady, setChatExportReady]     = useState(false);
-  const [chatExportName, setChatExportName]       = useState("");
+  // Setter intentionally not destructured: nothing ever called setChatLoading, so this
+  // is always false and the chat spinner is driven by ragLoading alone. Kept (rather
+  // than deleted) because the three render sites below still read it.
+  const [chatLoading]                             = useState(false);
 
   // schema_to_dataset : { schema_col: dataset_col }  — populated by /get_mappings
   const [schemaToDataset, setSchemaToDataset]     = useState({});

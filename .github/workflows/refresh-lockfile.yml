@@ -1,0 +1,84 @@
+# Utility workflow - not part of CI. Run it, download the artifact, commit the file.
+#
+# Why dq-app/package-lock.json needs regenerating:
+#
+#   react-scripts@5.0.1 depends on tailwindcss@^3.0.2, and tailwindcss@3.4.19 accepts
+#   "postcss-load-config": "^4.0.2 || ^5.0 || ^6.0", which npm resolves to 6.0.1.
+#   postcss-load-config@6 declares an OPTIONAL peer dependency on yaml@^2.4.2.
+#
+#   Newer npm puts resolvable optional peers into the ideal tree; the npm that wrote
+#   the committed lock did not. (That lock still carries a "license" field on 1357 of
+#   its 1359 entries, which npm stopped emitting after 10.3.0 - see npm/cli#7384 - so
+#   it predates the runner's npm by a wide margin.) `npm ci` compares the lock against
+#   the tree it computes, finds yaml@2.9.0 absent, and refuses. Nothing is wrong with
+#   package.json, so editing it will not help: only a regenerated lock will.
+#
+# This runs a FULL `npm install` rather than `--package-lock-only` on purpose - the
+# latter does not build a real tree and reproduces the same optional-peer gap.
+#
+# Delete this workflow once the regenerated lock is committed.
+#
+# If you install Node 20 locally you can skip the whole round trip:
+#   cd dq-app && npm install -g npm@10.9.2 && npm install && git add package-lock.json
+
+name: Refresh frontend lockfile
+
+on:
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    name: regenerate dq-app/package-lock.json
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Must match the pin in ci.yml exactly, or the lock this job produces will be
+      # rejected by the very job it is meant to unblock.
+      - name: Pin npm
+        run: npm install -g npm@10.9.2
+
+      - name: Report toolchain
+        run: |
+          echo "node $(node --version)"
+          echo "npm  $(npm --version)"
+
+      - name: Regenerate lockfile
+        working-directory: dq-app
+        run: npm install
+
+      - name: Show what changed
+        working-directory: dq-app
+        run: git --no-pager diff --stat -- package-lock.json
+
+      # The artifact is only worth committing if the job that consumes it will accept
+      # it. Reinstall from scratch exactly as ci.yml does, and fail here if it would
+      # still break - better to learn that now than on the next push.
+      - name: Verify npm ci accepts the regenerated lockfile
+        working-directory: dq-app
+        run: |
+          rm -rf node_modules
+          npm ci
+
+      - name: Verify the frontend still tests and builds against it
+        working-directory: dq-app
+        env:
+          CI: true
+        run: |
+          npm test -- --watchAll=false --passWithNoTests
+          npm run build
+
+      - name: Upload regenerated lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-lock-json
+          path: dq-app/package-lock.json
+          if-no-files-found: error

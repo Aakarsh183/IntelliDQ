@@ -144,3 +144,6 @@ def func():
             print(cosine_scores)
 func()
 '''
+
+# till now we have done  CI testing phase and it's reviewed by 1 approval and branch is also protected by certain rules and the PR is merged into main branch what is the next process and till the phase we have done what are the places where we can make agentic  and we want to build prototype and show to the internal leadership team provide the complete end to end architecture.
+# now what are the , but now i want to know about docker and how docker images build containerization process are remaining , so please describe further process what should i do ?

@@ -3187,7 +3187,8 @@ import json
 os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
-os.environ['JAVA_HOME'] = r"C:\Program Files\Java\jdk-17.0.19"
+# setdefault, not assignment: a container/CI JAVA_HOME must win. The literal below is only a Windows dev fallback.
+os.environ.setdefault('JAVA_HOME', r"C:\Program Files\Java\jdk-17.0.19")
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
@@ -4023,11 +4024,11 @@ async def regenerate_code(payload: dict):
         return response
 
     dfs          = session["dfs"]
-    #original_dfs = session["original_dfs"]
+    # original_dfs = session["original_dfs"]
     tables_meta  = session["tables_meta"]
     rule_name    = rule.get("name", "")
 
-    def _find_tables_for_schema_cols(schema_cols, schema_to_dataset, tables_meta, original_dfs):
+    def _find_tables_for_schema_cols(schema_cols, schema_to_dataset, tables_meta):
         involved = set()
         for schema_col in schema_cols:
             dataset_col = schema_to_dataset.get(schema_col, schema_col)
@@ -4045,7 +4046,7 @@ async def regenerate_code(payload: dict):
     rule_schema_cols = [mapped_dict[e] for e in entities if e in mapped_dict]
 
     involved_tables = _find_tables_for_schema_cols(
-        rule_schema_cols, schema_to_dataset, tables_meta, original_dfs
+        rule_schema_cols, schema_to_dataset, tables_meta
     )
 
     if not involved_tables:

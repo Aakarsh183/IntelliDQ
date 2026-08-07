@@ -1,26 +1,49 @@
-# LangChain Core
+# Runtime dependencies for the served app (backend/main_app.py).
+#
+# Derived from the imports in the LIVE sections of main_app.py, grok_client.py,
+# column_resolver.py and rag.py (everything above those files' final ''' block is
+# a stale copy and its imports are deliberately NOT reflected here).
+#
+# Still unpinned: pin from a known-good `pip freeze` into requirements.lock.txt.
+# CI installs the lock file when it exists and falls back to this file otherwise.
+
+# Web
+fastapi
+uvicorn[standard]
+python-multipart          # required by FastAPI's UploadFile/File parameters
+
+# Data
+pandas
+openpyxl                  # pd.read_excel / pd.ExcelFile engine
+pyspark                   # needs a JVM - CI installs Temurin 17
+numpy
+scikit-learn              # sklearn.metrics.pairwise in column_resolver
+rapidfuzz
+
+# HTTP
+requests
+httpx
+
+# LangChain / LLM
 langchain
 langchain-core
+langchain-classic         # langchain_classic.retrievers.EnsembleRetriever in rag.py
+langchain-community       # FAISS vectorstore, HuggingFaceEmbeddings, BM25Retriever
+langchain-text-splitters
+langchain-openai          # AzureChatOpenAI
+openai                    # AzureOpenAI - used directly by grok_client/column_resolver
+faiss-cpu
+rank-bm25                 # backs langchain_community BM25Retriever
+sentence-transformers     # imported at module scope by column_resolver.py
 
-# OpenAI Integration
-langchain-openai
-openai
+# Config
+python-dotenv
 
-# Anthropic Integration
+# Not imported by the live app - carried over from the previous requirements file.
+# Remove once the team confirms no branch depends on them (each one costs CI time).
 langchain-anthropic
-
-# Google Gemini (PaLM) Integration
 langchain-google-genai
 google-generativeai
-
-# Hugging Face Integration
 langchain-huggingface
 transformers
 huggingface-hub
-
-# Environment Variable Management
-python-dotenv
-
-# Machine Learning Utilities
-numpy
-scikit-learn
