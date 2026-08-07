@@ -1,0 +1,61 @@
+# Build context for the BACKEND image (repo root). The frontend has its own context
+# and its own dq-app/.dockerignore - dq-app is excluded wholesale here.
+#
+# This repo needs a .dockerignore more than most: the root also holds a React app, three
+# copies of its build output, sample spreadsheets and OneDrive metadata, all of which
+# would otherwise be uploaded to the daemon on every build.
+
+.git
+.gitignore
+.github
+.claude
+.vscode
+
+# Python local artifacts
+.venv
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+pytest.ini
+.flake8
+
+# Secrets must never reach an image layer. The ** prefix is load-bearing: a bare `.env`
+# pattern matches ONLY the context root, and this image does `COPY backend/ /app/` -
+# which would otherwise bake backend/.env (real Azure credentials) into the image.
+# Verify with:  docker history --no-trunc intellidq-backend:local
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Frontend - built by dq-app/Dockerfile, irrelevant to the API image
+dq-app/
+src/
+
+# Not the served app: root main_app.py is a 556-byte stub, backend/main.py is a script,
+# and test.py files are scratch Spark experiments that run work at import.
+main_app.py
+test.py
+backend/test.py
+backend/tests/
+database/
+
+# Runtime state, not source. .session_store holds real uploaded spreadsheets.
+backend/.session_store/
+backend/dq_results.json
+
+# Docs and sample data. The app receives datasets by upload, so nothing live reads these
+# from disk - if you ever point a served endpoint at one, drop the matching line.
+*.md
+*.xlsx
+*.csv
+backend/*.xlsx
+backend/*.csv
+
+Dockerfile
+docker-compose.yml
+.dockerignore

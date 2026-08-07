@@ -3187,7 +3187,8 @@ import json
 os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
-os.environ['JAVA_HOME'] = r"C:\Program Files\Java\jdk-17.0.19"
+# setdefault, not assignment: a container/CI JAVA_HOME must win. The literal below is only a Windows dev fallback.
+os.environ.setdefault('JAVA_HOME', r"C:\Program Files\Java\jdk-17.0.19")
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File

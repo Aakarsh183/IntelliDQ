@@ -78,6 +78,60 @@ jobs:
           path: coverage.xml
           if-no-files-found: warn
 
+      # Docker steps run last on purpose. The image is large (torch + pyspark + a JVM,
+      # roughly 2.5-3 GB) and takes minutes to build, so there is no point paying for it
+      # on a commit whose tests already failed.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: intellidq-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Building only proves the Dockerfile is valid; it does not prove the app starts.
+      # That distinction matters here: the JAVA_HOME and AzureOpenAI-at-import problems
+      # are both runtime failures that a successful build would happily hide.
+      #
+      # The Azure values are deliberate throwaways. Constructing an AzureOpenAI client
+      # performs no network I/O, so this satisfies the import without touching a live
+      # endpoint - CI must never call a real LLM: it is slow, costs money and flakes.
+      - name: Smoke-test the image
+        run: |
+          docker run -d --name dq -p 8000:8000 \
+            -e AZURE_OPENAI_API_KEY=placeholder-key-not-used-in-ci \
+            -e AZURE_OPENAI_ENDPOINT=https://placeholder.invalid/ \
+            -e AZURE_OPENAI_API_VERSION=2024-02-01 \
+            -e AZURE_OPENAI_DEPLOYMENT=placeholder-deployment \
+            intellidq-backend:${{ github.sha }}
+
+          # Up to 120s: importing torch, transformers and pyspark is genuinely slow on a
+          # cold container, and a too-short timeout here reads as a crash.
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/docs > /dev/null 2>&1; then
+              echo "app is up after ~$((i * 2))s"
+              exit 0
+            fi
+            if [ "$(docker inspect -f '{{.State.Running}}' dq)" != "true" ]; then
+              echo "container exited early"
+              break
+            fi
+            sleep 2
+          done
+
+          echo "::error::app failed to start - container logs follow"
+          docker logs dq
+          exit 1
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs dq || true
+
   frontend:
     name: frontend (build + test)
     runs-on: ubuntu-latest

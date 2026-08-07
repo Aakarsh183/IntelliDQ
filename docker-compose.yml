@@ -1,0 +1,58 @@
+# Runs the whole stack locally:
+#   cp .env.example backend/.env    # then fill in your Azure values (backend/.env is gitignored)
+#   docker compose up --build
+#
+#   frontend  http://localhost:3000
+#   backend   http://localhost:8000/docs
+#
+# No `version:` key - it has been obsolete since Compose v2 and now only prints a warning.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: intellidq-backend:local
+    ports:
+      # Must stay 8000 on the host. src/api.js hardcodes http://localhost:8000, and that
+      # URL is resolved by the user's BROWSER, not by the frontend container - so compose
+      # networking and service names are irrelevant to it. Remapping this port breaks
+      # every API call in the UI.
+      - "8000:8000"
+    env_file:
+      # Required: main_app.py builds an AzureOpenAI client at import and the SDK raises
+      # if api_key or azure_endpoint is unset, so the container exits before serving.
+      #
+      # Deliberately backend/.env rather than a root .env - one secrets file, already
+      # gitignored and already populated. It also avoids a real trap: Compose implicitly
+      # loads a root .env for ${VAR} interpolation INTO this file, so keeping secrets
+      # there conflates "values for the container" with "values for compose itself".
+      - backend/.env
+    volumes:
+      # Containers are ephemeral but the app writes real state: uploaded spreadsheets go
+      # to .session_store, and dq_function_factory.py generates dq_checks.py next to the
+      # code. Without this volume every restart loses in-flight sessions.
+      #
+      # dq_checks.py is deliberately NOT persisted - it is regenerated per rule, and
+      # mounting a single file over the source tree is fragile. Revisit before production.
+      - session-store:/app/.session_store
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./dq-app
+      dockerfile: Dockerfile
+    image: intellidq-frontend:local
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        # Waits for the backend HEALTHCHECK rather than merely for the container to
+        # exist. Note the consequence: if the backend cannot start (bad or missing Azure
+        # credentials), the frontend never starts either. Check `docker compose logs
+        # backend` first when nothing comes up.
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  session-store:

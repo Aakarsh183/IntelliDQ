@@ -1,0 +1,21 @@
+node_modules
+build
+
+# Committed CRA build output - three stale copies, none of them inputs to this build
+temp-build
+temp-build-2
+temp-build-exec-fix
+
+.git
+.gitignore
+coverage
+.env
+.env.*
+npm-debug.log*
+
+# A stray copy of the backend app that has no business in the frontend image
+main_app.py
+
+README.md
+Dockerfile
+.dockerignore
