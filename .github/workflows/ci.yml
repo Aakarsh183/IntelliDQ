@@ -172,7 +172,6 @@ jobs:
         working-directory: dq-app
         run: npm run build
 
-
 #######################Frontend Docker#################################################
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
