@@ -4,7 +4,7 @@ import sys
 os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
-# Hello world checking and testing
+
 import pandas as pd
 import json
 from pyspark.sql import SparkSession
